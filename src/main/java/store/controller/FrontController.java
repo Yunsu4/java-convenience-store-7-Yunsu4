@@ -53,18 +53,25 @@ public class FrontController {
 
     private void run() {
         MembershipController membershipController = new MembershipController(inputView);
+        boolean skipStartMessage = false;
 
         while (true) {
             try {
-                outputView.startMessage();
-                display();
+                if (!skipStartMessage) {
+                    outputView.startMessage();
+                    display();
+                }
+
                 Receipt receipt = promotionController.process();
                 membershipController.execute(receipt);
                 printTotalReceipt(receipt);
                 return;
             } catch (ErrorException e) {
                 System.out.println(e.getMessage());
-                new FrontController(inputView, outputView, productController, promotionController);
+                if (e.getMessage().contains(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK.getMessage())) {
+                    skipStartMessage = true;
+                }
+                //new FrontController(inputView, outputView, productController, promotionController);
             }
         }
     }
