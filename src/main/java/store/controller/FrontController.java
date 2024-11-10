@@ -72,6 +72,7 @@ public class FrontController {
                         e.getMessage().contains(InputErrorType.NEED_EXISTING_PRODUCT.getMessage())) {
                     skipStartMessage = true;
                 }
+                new FrontController(inputView, outputView, productController, promotionController);
             }
         }
     }
