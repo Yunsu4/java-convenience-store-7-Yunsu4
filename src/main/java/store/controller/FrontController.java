@@ -68,10 +68,10 @@ public class FrontController {
                 return;
             } catch (ErrorException e) {
                 System.out.println(e.getMessage());
-                if (e.getMessage().contains(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK.getMessage())) {
+                if (e.getMessage().contains(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK.getMessage()) ||
+                        e.getMessage().contains(InputErrorType.NEED_EXISTING_PRODUCT.getMessage())) {
                     skipStartMessage = true;
                 }
-                //new FrontController(inputView, outputView, productController, promotionController);
             }
         }
     }
@@ -86,7 +86,7 @@ public class FrontController {
         throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
     }
 
-    private void printTotalReceipt(Receipt receipt){
+    private void printTotalReceipt(Receipt receipt) {
         outputView.printReceiptStart();
         printProductDetails(receipt);
         outputView.startPrintBonusProduct();
@@ -126,31 +126,6 @@ public class FrontController {
 
 
     private void printBonusProductDetails(Receipt receipt) {
-        /*
-        List<String> bonusProductDetails = receipt.getBonusProductDetails();
-        int groupSize = 2;
-        StringBuilder output = new StringBuilder();
-
-        if(bonusProductDetails == null){
-            return;
-        }
-
-        for (int i = 0; i < bonusProductDetails.size(); i++) {
-            output.append(bonusProductDetails.get(i));
-
-            if ((i + 1) % groupSize == 0) {
-                output.append(newline);
-            }
-
-            if ((i + 1) % groupSize != 0 && i != bonusProductDetails.size() - 1) {
-                output.append("    ");
-            }
-        }
-
-        System.out.print(output);
-    }
-
-         */
         List<String> bonusProductDetails = receipt.getBonusProductDetails();
         int groupSize = 2;
         StringBuilder output = new StringBuilder();
@@ -171,7 +146,7 @@ public class FrontController {
             }
 
             if ((i + 1) % groupSize != 0 && i != bonusProductDetails.size() - 1) {
-                output.append(detail).append("    ");
+                output.append(detail).append("            ");
             }
         }
 
