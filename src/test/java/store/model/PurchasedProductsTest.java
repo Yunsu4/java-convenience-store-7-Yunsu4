@@ -36,17 +36,4 @@ class PurchasedProductsTest {
         assertThatThrownBy(() -> new PurchasedProducts(List.of("사이다-")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
-
-/*
-    @Test
-    void 생성자_테스트() {
-        PurchasedProducts purchasedProducts = new PurchasedProducts(List.of("[사이다-3]","[감자칩-1]"));
-        List<Integer> expectedLotto = List.of(1, 2, 3, 4, 5, 6);
-
-        assertEquals(lotto.getLottoNumbers(), expectedLotto);
-    }
-
-
- */
 }
