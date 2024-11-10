@@ -2,6 +2,8 @@ package store.controller;
 
 import static store.controller.PromotionController.getValidInput;
 
+import java.text.NumberFormat;
+import java.util.List;
 import store.model.Receipt;
 import store.view.InputView;
 import store.view.OutputView;
@@ -9,9 +11,11 @@ import store.view.error.ErrorException;
 import store.view.error.InputErrorType;
 
 public class FrontController {
+
+    private static final String newline = System.getProperty("line.separator");
+
     private final InputView inputView;
     private final OutputView outputView;
-
     private final ProductController productController;
     private final PromotionController promotionController;
 
@@ -52,10 +56,11 @@ public class FrontController {
 
         while (true) {
             try {
+                outputView.startMessage();
                 display();
                 Receipt receipt = promotionController.process();
                 membershipController.execute(receipt);
-                receipt.printFinalReceipt();
+                printTotalReceipt(receipt);
                 return;
             } catch (ErrorException e) {
                 System.out.println(e.getMessage());
@@ -72,5 +77,97 @@ public class FrontController {
             return false;
         }
         throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
+    }
+
+    private void printTotalReceipt(Receipt receipt){
+        outputView.printReceiptStart();
+        printProductDetails(receipt);
+        outputView.startPrintBonusProduct();
+        printBonusProductDetails(receipt);
+        outputView.printDividingLine();
+        receipt.printFinalReceipt();
+    }
+
+
+    private void printProductDetails(Receipt receipt) {
+        List<String> productDetails = receipt.getProductDetails();
+        int groupSize = 3;
+        StringBuilder output = new StringBuilder();
+
+        NumberFormat numberFormat = NumberFormat.getInstance();
+
+        for (int i = 0; i < productDetails.size(); i++) {
+            String detail = productDetails.get(i);
+
+            if ((i + 1) % groupSize == 0) {
+                try {
+                    int number = Integer.parseInt(detail);
+                    output.append(numberFormat.format(number));
+                } catch (NumberFormatException e) {
+                    output.append(detail);
+                }
+                output.append(newline);
+            }
+
+            if ((i + 1) % groupSize != 0 && i != productDetails.size() - 1) {
+                output.append(detail).append("    ");
+            }
+        }
+
+        System.out.print(output);
+    }
+
+
+    private void printBonusProductDetails(Receipt receipt) {
+        /*
+        List<String> bonusProductDetails = receipt.getBonusProductDetails();
+        int groupSize = 2;
+        StringBuilder output = new StringBuilder();
+
+        if(bonusProductDetails == null){
+            return;
+        }
+
+        for (int i = 0; i < bonusProductDetails.size(); i++) {
+            output.append(bonusProductDetails.get(i));
+
+            if ((i + 1) % groupSize == 0) {
+                output.append(newline);
+            }
+
+            if ((i + 1) % groupSize != 0 && i != bonusProductDetails.size() - 1) {
+                output.append("    ");
+            }
+        }
+
+        System.out.print(output);
+    }
+
+         */
+        List<String> bonusProductDetails = receipt.getBonusProductDetails();
+        int groupSize = 2;
+        StringBuilder output = new StringBuilder();
+
+        NumberFormat numberFormat = NumberFormat.getInstance();
+
+        for (int i = 0; i < bonusProductDetails.size(); i++) {
+            String detail = bonusProductDetails.get(i);
+
+            if ((i + 1) % groupSize == 0) {
+                try {
+                    int number = Integer.parseInt(detail);
+                    output.append(numberFormat.format(number));
+                } catch (NumberFormatException e) {
+                    output.append(detail);
+                }
+                output.append(newline);
+            }
+
+            if ((i + 1) % groupSize != 0 && i != bonusProductDetails.size() - 1) {
+                output.append(detail).append("    ");
+            }
+        }
+
+        System.out.print(output);
     }
 }
