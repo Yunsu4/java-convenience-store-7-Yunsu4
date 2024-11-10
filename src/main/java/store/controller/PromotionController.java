@@ -135,7 +135,7 @@ public class PromotionController {
                 //프로모션 없는 거를 정가로 구매하기
                 promotable.decreaseQuantity(promotionalProductQuantity);
                 nonPromotable.decreaseQuantity(nonPromotableQuantity);
-                receipt.updateReceipt(purchasedProduct, promotionalProductQuantity, promotionBonusQuantity);
+                receipt.updateReceipt(purchasedProduct, 0, 0);
                 continue;
             }
 
