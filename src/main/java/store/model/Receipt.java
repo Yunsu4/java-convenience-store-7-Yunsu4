@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Receipt {
 
-    private int totalBonusQuantity = 0;
     private int totalDiscountedPrice = 0;
     private int totalFullPrice = 0;
     private int totalOriginalPrice = 0;
@@ -46,7 +45,6 @@ public class Receipt {
         totalFullPrice += (purchaseQuantity - promotableQuantity) * currentPurchasePrice;
         totalPurchaseQuantity += purchaseQuantity;
 
-        totalBonusQuantity += promotionBonusQuantity;
         int currentOriginalPrice = currentPurchasePrice * purchaseQuantity;
         totalOriginalPrice += currentOriginalPrice;
         finalAmountDue = totalOriginalPrice - totalDiscountedPrice - membershipDiscountPrice;
@@ -84,9 +82,7 @@ public class Receipt {
     public void printFinalReceipt() {
         System.out.println(
                 "총 구매액    " + String.format("%,d", totalPurchaseQuantity) +"    "+ String.format("%,d", totalOriginalPrice));
-        //System.out.println("증정 상품 개수: " + String.format("%,d", totalBonusQuantity));
-        System.out.println("행사 할인" + String.format("       %,d", -totalDiscountedPrice));
-        //System.out.println("정가로 구매한 금액: " + String.format("%,d", totalFullPrice));
+        System.out.println("행사 할인" + String.format("       -%,d", totalDiscountedPrice));
         System.out.println("멤버십 할인" + String.format("       -%,d", membershipDiscountPrice));
         System.out.println("내실돈" + String.format("        %,d", finalAmountDue));
     }
@@ -98,9 +94,5 @@ public class Receipt {
             membershipDiscountPrice = 8000;
         }
         finalAmountDue = totalOriginalPrice - totalDiscountedPrice - membershipDiscountPrice;
-
-
     }
-
-
 }
