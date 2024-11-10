@@ -17,6 +17,5 @@ public class MembershipController {
         if (membershipDiscount.equals("Y")) {
             receipt.executeMembership();
         }
-        receipt.printFinalReceipt();
     }
 }

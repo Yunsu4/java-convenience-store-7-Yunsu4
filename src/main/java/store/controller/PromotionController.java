@@ -9,6 +9,7 @@ import store.model.Product;
 import store.model.ProductStock;
 import store.model.Promotion;
 import store.model.Promotions;
+import store.model.PurchaseDetail;
 import store.model.PurchasedProducts;
 import store.model.Receipt;
 import store.view.InputView;
@@ -39,7 +40,7 @@ public class PromotionController {
         LocalDateTime localDateTime = DateTimes.now();
 
         PurchasedProducts purchasedProducts = executeWithRetry(items, PurchasedProducts::new);
-        Receipt receipt = new Receipt(purchasedProducts, productStock);
+        Receipt receipt = new Receipt(purchasedProducts, productStock, new PurchaseDetail());
 
         for (Product purchasedProduct : purchasedProducts.getProducts()) {
             String productName = purchasedProduct.getValueOfTheField("name");
@@ -142,11 +143,8 @@ public class PromotionController {
 
             int promotableQuantity =
                     (promotionalProductQuantity / promotionAcquiredQuantity) * promotionAcquiredQuantity;
-            System.out.println("프로모션 받을 수 있는 개수: " + promotableQuantity);
 
             purchaseQuantity = purchasedProduct.parseQuantity();
-            System.out.println("구매 개수" + purchaseQuantity);
-
             int nonPromotableQuantity = purchaseQuantity - promotableQuantity;
 
             // 프로모션 받을 수 있는 개수>= 구매 개수
@@ -155,7 +153,7 @@ public class PromotionController {
 
                 //내가 프로모션 받은 거 개수
                 int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
-                receipt.updateReceipt(purchasedProduct, received, promotionBonusQuantity);
+                receipt.updateReceipt(purchasedProduct, received, received/promotionAcquiredQuantity);
                 continue;
             }
 
@@ -167,13 +165,13 @@ public class PromotionController {
             );
             if (!purchaseFullPrice) {
                 purchasedProduct.decreaseQuantity(nonPromotableQuantity);
-                receipt.updateReceipt(purchasedProduct, promotableQuantity, promotionBonusQuantity);
+                receipt.updateReceipt(purchasedProduct, promotableQuantity, promotableQuantity/promotionAcquiredQuantity);
                 continue;
             }
             promotable.decreaseQuantity(promotableQuantity);
             purchaseFullPrice(promotable, nonPromotableQuantity, nonPromotable);
 
-            receipt.updateReceipt(purchasedProduct, promotableQuantity, promotionBonusQuantity);
+            receipt.updateReceipt(purchasedProduct, promotableQuantity, promotableQuantity/promotionAcquiredQuantity);
 
         }
 
