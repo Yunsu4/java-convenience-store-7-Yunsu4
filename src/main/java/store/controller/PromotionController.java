@@ -153,7 +153,7 @@ public class PromotionController {
 
                 //내가 프로모션 받은 거 개수
                 int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
-                receipt.updateReceipt(purchasedProduct, received, received/promotionAcquiredQuantity);
+                receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
                 continue;
             }
 
@@ -165,13 +165,16 @@ public class PromotionController {
             );
             if (!purchaseFullPrice) {
                 purchasedProduct.decreaseQuantity(nonPromotableQuantity);
-                receipt.updateReceipt(purchasedProduct, promotableQuantity, promotableQuantity/promotionAcquiredQuantity);
+                int finalPurchaseQuantity = purchasedProduct.parseQuantity();
+                promotable.decreaseQuantity(finalPurchaseQuantity);
+                receipt.updateReceipt(purchasedProduct, promotableQuantity,
+                        promotableQuantity / promotionAcquiredQuantity);
                 continue;
             }
             promotable.decreaseQuantity(promotableQuantity);
             purchaseFullPrice(promotable, nonPromotableQuantity, nonPromotable);
 
-            receipt.updateReceipt(purchasedProduct, promotableQuantity, promotableQuantity/promotionAcquiredQuantity);
+            receipt.updateReceipt(purchasedProduct, promotableQuantity, promotableQuantity / promotionAcquiredQuantity);
 
         }
 
