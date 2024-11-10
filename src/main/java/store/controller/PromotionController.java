@@ -119,9 +119,10 @@ public class PromotionController {
             // 프로모션 재고< 프로모션 해당 개수
             if (promotionalProductQuantity < promotionAcquiredQuantity) {
                 int nonPromotableQuantity = purchaseQuantity - promotionalProductQuantity;
+                int finalPurchaseQuantity = purchaseQuantity;
 
                 boolean purchaseFullPrice = getValidInput(
-                        () -> inputView.readPurchaseFullPrice(productName, nonPromotableQuantity),
+                        () -> inputView.readPurchaseFullPrice(productName, finalPurchaseQuantity),
                         this::isValidPositive
                 );
 
