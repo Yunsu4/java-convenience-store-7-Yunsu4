@@ -81,10 +81,10 @@ public class Receipt {
 
     public void printFinalReceipt() {
         System.out.println(
-                "총 구매액    " + String.format("%,d", totalPurchaseQuantity) +"    "+ String.format("%,d", totalOriginalPrice));
-        System.out.println("행사 할인" + String.format("       -%,d", totalDiscountedPrice));
-        System.out.println("멤버십 할인" + String.format("       -%,d", membershipDiscountPrice));
-        System.out.println("내실돈" + String.format("        %,d", finalAmountDue));
+                "총 구매액          " + String.format("%,d", totalPurchaseQuantity) +String.format("          %,d", totalOriginalPrice));
+        System.out.println("행사 할인" + String.format("                     -%,d", totalDiscountedPrice));
+        System.out.println("멤버십 할인" + String.format("                    -%,d", membershipDiscountPrice));
+        System.out.println("내실돈" + String.format("                        %,d", finalAmountDue));
     }
 
 

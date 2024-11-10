@@ -11,7 +11,7 @@ public class OutputView {
 
     public void printReceiptStart(){
         System.out.println("==============W 편의점================"
-                +newline+"상품명        수량    금액");
+                +newline+  "상품명            수량        금액");
     }
 
     public void startPrintBonusProduct(){
