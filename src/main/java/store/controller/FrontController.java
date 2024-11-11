@@ -68,8 +68,12 @@ public class FrontController {
                 return;
             } catch (ErrorException e) {
                 System.out.println(e.getMessage());
+                /*
                 if (e.getMessage().contains(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK.getMessage()) ||
                         e.getMessage().contains(InputErrorType.NEED_EXISTING_PRODUCT.getMessage())) {
+                    skipStartMessage = true;
+                }*/
+                if(!e.getMessage().isEmpty()){
                     skipStartMessage = true;
                 }
                 new FrontController(inputView, outputView, productController, promotionController);
@@ -90,7 +94,6 @@ public class FrontController {
     private void printTotalReceipt(Receipt receipt) {
         outputView.printReceiptStart();
         printProductDetails(receipt);
-        //outputView.startPrintBonusProduct();
         printBonusProductDetails(receipt);
         outputView.printDividingLine();
         receipt.printFinalReceipt();
