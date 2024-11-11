@@ -16,7 +16,7 @@ public class PurchasedProducts {
 
     private List<Product> purchasedProducts;
 
-    public PurchasedProducts(List<String> items) {
+    public PurchasedProducts(List<String> items)  throws ErrorException {
         validateInputItems(items);
         this.purchasedProducts = extractPurchasedProduct(items);
     }
@@ -30,7 +30,7 @@ public class PurchasedProducts {
         }
     }
 
-    public List<Product> extractPurchasedProduct(List<String> items) {
+    public List<Product> extractPurchasedProduct(List<String> items) throws ErrorException {
 
         return items.stream()
                 .map(product -> product.split("-"))
@@ -44,15 +44,15 @@ public class PurchasedProducts {
     }
 
 
-    private int parseValidQuantity(String quantity) {
+    private int parseValidQuantity(String quantity)  throws ErrorException {
         int parsedQuantity = Integer.parseInt(quantity);
         validateQuantity(parsedQuantity);
         return parsedQuantity;
     }
 
-    private void validateQuantity(int quantity) {
+    private void validateQuantity(int quantity) throws ErrorException{
         if (quantity <= 0) {
-            throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
+            throw new ErrorException(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK);
         }
     }
 

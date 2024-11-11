@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.model.Product;
 import store.model.ProductStock;
+import store.model.PurchasedProducts;
 import store.view.error.ErrorException;
 import store.view.error.InputErrorType;
 
@@ -58,35 +59,34 @@ public class ProductController {
         return count;
     }
 
-
-
-
-
-
-
     private boolean isValidProductFormat(String product) {
         return PRODUCT_PATTERN.matcher(product).matches();
     }
 
 
-    public void checkProductInConvenience(Product promotable, Product nonPromotable) {
-        if (isOutOfStock(promotable) && isOutOfStock(nonPromotable)) {
-            throw new ErrorException(InputErrorType.NEED_EXISTING_PRODUCT);
+    public void checkProductInConvenience(PurchasedProducts purchasedProducts, ProductStock productStock) {
+        List<String> productNames = purchasedProducts.getProductsNames();
+
+        List<String> stockNames = productStock.getProductsNames();
+
+        for (String productName : productNames) {
+            if (!stockNames.contains(productName)) {
+                throw new ErrorException(InputErrorType.NEED_EXISTING_PRODUCT);
+            }
+        }
+
+    }
+
+    public void checkProductQuantityAvailable(PurchasedProducts purchasedProducts, ProductStock productStock) {
+        for (Product purchasedProduct : purchasedProducts.getProducts()) {
+            String productName = purchasedProduct.getValueOfTheField("name");
+
+            int totalStockQuantity =productStock.getTotalQuantityByName(productName);
+
+            if (totalStockQuantity < purchasedProduct.parseQuantity()) {
+                throw new ErrorException(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK);
+            }
         }
     }
-
-    private boolean isOutOfStock(Product productInStock) {
-        return productInStock == null;
-    }
-
-    public void checkProductQuantityAvailable(ProductStock productStock, Product purchasedProduct) {
-        String productName = purchasedProduct.getValueOfTheField("name");
-        int quantityOfStock = productStock.getTotalQuantityByName(productName);
-
-        if (quantityOfStock < purchasedProduct.parseQuantity()) {
-            throw new ErrorException(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK);
-        }
-    }
-
 
 }

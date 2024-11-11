@@ -4,6 +4,7 @@ package store.model;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import store.util.FileDataLoader;
 
 public class ProductStock {
@@ -54,6 +55,12 @@ public class ProductStock {
             }
         }
         return null;
+    }
+
+    public List<String> getProductsNames() {
+        return products.stream()
+                .map(product -> product.getValueOfTheField("name"))
+                .collect(Collectors.toList());
     }
 
     public Product getSameFieldProductWithPromotion(String value, String field, boolean isPromotable){

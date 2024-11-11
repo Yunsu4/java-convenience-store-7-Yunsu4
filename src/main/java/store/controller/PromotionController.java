@@ -39,16 +39,19 @@ public class PromotionController {
         List<String> items = getValidInput(inputView::readItem, productController::extractValidProducts);
         LocalDateTime localDateTime = DateTimes.now();
 
-        PurchasedProducts purchasedProducts = executeWithRetry(items, PurchasedProducts::new);
+        PurchasedProducts purchasedProducts = new PurchasedProducts(items);
+        productController.checkProductInConvenience(purchasedProducts, productStock);
+        productController.checkProductQuantityAvailable(purchasedProducts, productStock);
+
+
         Receipt receipt = new Receipt(purchasedProducts, productStock, new PurchaseDetail());
+
 
         for (Product purchasedProduct : purchasedProducts.getProducts()) {
             String productName = purchasedProduct.getValueOfTheField("name");
             Product promotable = productStock.getSameFieldProductWithPromotion(productName, "name", true);
             Product nonPromotable = productStock.getSameFieldProductWithPromotion(productName, "name", false);
 
-            productController.checkProductInConvenience(promotable, nonPromotable);
-            productController.checkProductQuantityAvailable(productStock, purchasedProduct);
 
             int purchaseQuantity = purchasedProduct.parseQuantity();
 
@@ -208,16 +211,6 @@ public class PromotionController {
             String input = inputSupplier.get();
             try {
                 return converter.apply(input);
-            } catch (ErrorException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-    private <T, U> T executeWithRetry(U inputSupplier, Function<U, T> constructor) {
-        while (true) {
-            try {
-                return constructor.apply(inputSupplier);
             } catch (ErrorException e) {
                 System.out.println(e.getMessage());
             }
