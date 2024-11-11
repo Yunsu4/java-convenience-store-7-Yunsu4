@@ -100,6 +100,29 @@ public class PromotionController {
 
             // 프로모션 최소 구매 개수<= 구매 개수< 프로모션 해당 개수
             if (promotionAcquiredQuantity > purchaseQuantity) {
+
+                if(promotionalProductQuantity<promotionMinQuantity){
+                    nonPromotable.decreaseQuantity(purchaseQuantity);
+                    receipt.updateReceipt(purchasedProduct, 0,0);
+                    continue;
+                }
+                if(promotionalProductQuantity==promotionMinQuantity){
+                    boolean purchaseFullPrice = getValidInput(
+                            () -> inputView.readPurchaseFullPrice(productName, promotionalProductQuantity),
+                            this::isValidPositive
+                    );
+
+                    if(!purchaseFullPrice){
+                        purchasedProduct.decreaseQuantity(promotionalProductQuantity);
+                        receipt.updateReceipt(purchasedProduct,0,0);
+                        continue;
+                    }
+                    promotable.decreaseQuantity(promotionalProductQuantity);
+                    int currentQuantity = purchaseQuantity-promotionalProductQuantity;
+                    nonPromotable.decreaseQuantity(currentQuantity);
+                    receipt.updateReceipt(purchasedProduct, 0,0);
+                    continue;
+                }
                 boolean addItem = getValidInput(
                         () -> inputView.readAddItem(productName, promotionBonusQuantity),
                         this::isValidPositive
