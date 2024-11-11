@@ -188,7 +188,6 @@ public class PromotionController {
                 }
                 int currentNonPromotableQuantity = purchaseQuantity%promotionAcquiredQuantity;
 
-                // 1+1 프로모션이고, 구매 수량이 홀수인 경우
                 if (promotionMinQuantity == 1 && currentNonPromotableQuantity == 1) {
                     boolean addItem = getValidInput(
                             () -> inputView.readAddItem(productName, 1),
@@ -205,11 +204,37 @@ public class PromotionController {
                         nonPromotable.decreaseQuantity(1);
                         receipt.updateReceipt(purchasedProduct, purchaseQuantity - 1, (purchaseQuantity - 1) / 2);
                     }
+                    continue;
+                }
+
+
+                // 프로모션 조건을 충족하지 않는 수량이 있는 경우
+                if (currentNonPromotableQuantity > 0) {
+                    int additionalItemsForPromotion = promotionAcquiredQuantity - currentNonPromotableQuantity;
+
+                    int finalAdditionalItemsForPromotion = additionalItemsForPromotion;
+                    boolean addItems = getValidInput(
+                            () -> inputView.readAddItem(productName, finalAdditionalItemsForPromotion),
+                            this::isValidPositive
+                    );
+
+                    if (addItems) {
+                        // 추가 구매로 프로모션 조건 충족
+                        purchasedProduct.decreaseQuantity(-finalAdditionalItemsForPromotion);
+                        purchaseQuantity += additionalItemsForPromotion;
+                        promotable.decreaseQuantity(purchaseQuantity);
+                        receipt.updateReceipt(purchasedProduct, purchaseQuantity, purchaseQuantity / promotionAcquiredQuantity);
+                    } else {
+                        // 추가 구매 거부, 일부만 프로모션 적용
+                        int promotionAppliedQuantity = purchaseQuantity - currentNonPromotableQuantity;
+                        promotable.decreaseQuantity(promotionAppliedQuantity);
+                        nonPromotable.decreaseQuantity(currentNonPromotableQuantity);
+                        receipt.updateReceipt(purchasedProduct, promotionAppliedQuantity, promotionAppliedQuantity / promotionAcquiredQuantity);
+                    }
                 } else {
-                    promotable.decreaseQuantity(purchaseQuantity - currentNonPromotableQuantity);
-                    nonPromotable.decreaseQuantity(currentNonPromotableQuantity);
-                    int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
-                    receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
+                    // 모든 수량이 프로모션 조건을 충족
+                    promotable.decreaseQuantity(purchaseQuantity);
+                    receipt.updateReceipt(purchasedProduct, purchaseQuantity, purchaseQuantity / promotionAcquiredQuantity);
                 }
                 continue;
             }
