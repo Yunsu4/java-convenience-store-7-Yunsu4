@@ -12,27 +12,32 @@ import store.view.error.InputErrorType;
 
 public class ProductController {
 
-    private static final Pattern PRODUCT_PATTERN = Pattern.compile("\\[(\\S+?-\\d+)]");
+
+    private static final Pattern BRACKET_PATTERN = Pattern.compile("[\\[](.*?)[\\]]");
+    private static final Pattern PRODUCT_PATTERN = Pattern.compile("^[가-힣a-zA-Z]+-\\d+$");
 
     public List<String> extractValidProducts(String input) throws ErrorException {
         List<String> products = new ArrayList<>();
-        Matcher matcher = PRODUCT_PATTERN.matcher(input);
+        Matcher matcher = BRACKET_PATTERN.matcher(input);
 
         while (matcher.find()) {
             String product = matcher.group(1);
-            products.add(product);
+            if (isValidProductFormat(product)) {
+                products.add(product);
+            } else {
+                throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
+            }
         }
 
-        String reconstructedInput = products.stream()
-                .map(p -> "[" + p + "]")
-                .reduce((p1, p2) -> p1 + "," + p2)
-                .orElse("");
-
-        if (!reconstructedInput.equals(input.trim())) {
+        if (products.isEmpty()) {
             throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
         }
 
         return products;
+    }
+
+    private boolean isValidProductFormat(String product) {
+        return PRODUCT_PATTERN.matcher(product).matches();
     }
 
 
