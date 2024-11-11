@@ -109,8 +109,6 @@ public class PromotionController {
                 if (!addItem) {
                     promotable.decreaseQuantity(purchaseQuantity);
                     receipt.updateReceipt(purchasedProduct, 0, 0);
-
-                    //계산로직으로 가라
                     continue;
                 }
                 //증정 상품 추가 구매할 경우
@@ -121,8 +119,8 @@ public class PromotionController {
 
             // 프로모션 재고< 프로모션 해당 개수
             if (promotionalProductQuantity < promotionAcquiredQuantity) {
-                int nonPromotableQuantity = purchaseQuantity - promotionalProductQuantity;
-                int finalPurchaseQuantity = purchaseQuantity;
+                int finalPurchaseQuantity = purchasedProduct.parseQuantity();
+                int nonPromotableQuantity = finalPurchaseQuantity - promotionalProductQuantity;
 
                 boolean purchaseFullPrice = getValidInput(
                         () -> inputView.readPurchaseFullPrice(productName, finalPurchaseQuantity),
@@ -131,7 +129,7 @@ public class PromotionController {
 
                 //프로모션 없는 거를 정가로 구매 안 하기
                 if (!purchaseFullPrice) {
-                    purchasedProduct.decreaseQuantity(purchaseQuantity);
+                    purchasedProduct.decreaseQuantity(finalPurchaseQuantity);
                     receipt.updateReceipt(purchasedProduct, 0, 0);
                     continue;
                 }
@@ -168,9 +166,9 @@ public class PromotionController {
 
                 if(!purchaseFullPrice){
                     purchasedProduct.decreaseQuantity(currentNonPromotableQuantity);
-                    promotable.decreaseQuantity(purchaseQuantity);
-                    int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
-                    receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
+                    int currentPurchaseQuantity = purchasedProduct.parseQuantity();
+                    promotable.decreaseQuantity(currentPurchaseQuantity);
+                    receipt.updateReceipt(purchasedProduct, currentPurchaseQuantity, currentPurchaseQuantity / promotionAcquiredQuantity);
                     continue;
                 }
 
