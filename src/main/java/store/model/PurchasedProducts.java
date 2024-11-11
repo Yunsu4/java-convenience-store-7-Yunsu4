@@ -2,6 +2,7 @@ package store.model;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class PurchasedProducts {
         }
     }
 
+    /*
     public List<Product> extractPurchasedProduct(List<String> items) throws ErrorException {
 
         return items.stream()
@@ -41,6 +43,32 @@ public class PurchasedProducts {
                     return new Product(product);
                 })
                 .toList();
+    }
+
+     */
+
+    public List<Product> extractPurchasedProduct(List<String> items) throws ErrorException {
+        Map<String, Product> productMap = new LinkedHashMap<>();
+
+        for (String item : items) {
+            String[] parts = item.split("-");
+            String name = parts[0];
+            int quantity = parseValidQuantity(parts[1]);
+
+            // 이미 동일한 이름의 상품이 있는 경우, 수량을 추가
+            if (productMap.containsKey(name)) {
+                Product existingProduct = productMap.get(name);
+                existingProduct.decreaseQuantity(-quantity); // 현재 수량에서 quantity 추가
+            } else {
+                // 새로운 상품인 경우, 맵에 추가
+                Map<String, Object> productData = new LinkedHashMap<>();
+                productData.put("name", name);
+                productData.put("quantity", quantity);
+                productMap.put(name, new Product(productData));
+            }
+        }
+
+        return new ArrayList<>(productMap.values());
     }
 
 
