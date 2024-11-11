@@ -12,77 +12,48 @@ import store.view.error.InputErrorType;
 
 public class ProductController {
 
+    private static final Pattern PRODUCT_PATTERN = Pattern.compile("\\[(\\S+?-\\d+)]");
 
-    public List<String> extractValidProducts(String input){
-        String trimmedInput = input.trim();
-        List<String> items = new ArrayList<>();
+    public List<String> extractValidProducts(String input) throws ErrorException {
+        List<String> products = new ArrayList<>();
+        Matcher matcher = PRODUCT_PATTERN.matcher(input);
 
-        String processedInput = extractProductRecursively(trimmedInput, items);
-        validateProductsAvailable(processedInput);
+        while (matcher.find()) {
+            String product = matcher.group(1);
+            products.add(product);
+        }
 
-        return items;
-    }
+        String reconstructedInput = products.stream()
+                .map(p -> "[" + p + "]")
+                .reduce((p1, p2) -> p1 + "," + p2)
+                .orElse("");
 
-    private void validateProductsAvailable(String processedInput) {
-        if(!processedInput.replace(",","").trim().isEmpty()){
+        if (!reconstructedInput.equals(input.trim())) {
             throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
         }
+
+        return products;
     }
 
-    private String extractProductRecursively(String input, List<String> products) {
-        try {
-            String product = extractProduct(input);
-            products.add(product);
-            String updatedInputString = removeExtractedProduct(input, product);
 
-            return extractProductRecursively(updatedInputString, products);
-        } catch (IllegalArgumentException e) {
-            return input;
-        }
-    }
-
-    private String extractProduct(String input) {
-        Matcher matcher = findProduct(input);
-        return matcher.group(1);
-    }
-
-    private String removeExtractedProduct(String input, String product) {
-        return input.replaceAll("\\["+product+"\\]","");
-    }
-
-    private Matcher findProduct(String input) {
-        Matcher matcher = createMatcher(input);
-
-        if (matcher.find()) {
-            return matcher;
-        }
-        throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
-    }
-
-    private Matcher createMatcher(String input) {
-        Pattern pattern = Pattern.compile("[\\[](.*?)[\\]]");
-        return pattern.matcher(input);
-    }
-
-    public void checkProductInConvenience(Product promotable, Product nonPromotable){
-        if(isOutOfStock(promotable) && isOutOfStock(nonPromotable)) {
+    public void checkProductInConvenience(Product promotable, Product nonPromotable) {
+        if (isOutOfStock(promotable) && isOutOfStock(nonPromotable)) {
             throw new ErrorException(InputErrorType.NEED_EXISTING_PRODUCT);
         }
     }
 
-    private boolean isOutOfStock(Product productInStock){
+    private boolean isOutOfStock(Product productInStock) {
         return productInStock == null;
     }
 
-    public void checkProductQuantityAvailable(ProductStock productStock, Product purchasedProduct){
+    public void checkProductQuantityAvailable(ProductStock productStock, Product purchasedProduct) {
         String productName = purchasedProduct.getValueOfTheField("name");
         int quantityOfStock = productStock.getTotalQuantityByName(productName);
 
-        if(quantityOfStock<purchasedProduct.parseQuantity()){
+        if (quantityOfStock < purchasedProduct.parseQuantity()) {
             throw new ErrorException(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK);
         }
     }
-
 
 
 }
