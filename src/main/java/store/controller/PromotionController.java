@@ -143,7 +143,7 @@ public class PromotionController {
                 continue;
             }
 
-            // 아래로 다 프로모션 재고>= 프로모션 해당 개수
+            // 아래로 다 프로모션 재고>= 프로모션 해당 개수,   구매 개수>= 프로모션 해당 개수
 
             int promotableQuantity =
                     (promotionalProductQuantity / promotionAcquiredQuantity) * promotionAcquiredQuantity;
@@ -153,6 +153,27 @@ public class PromotionController {
 
             // 프로모션 받을 수 있는 개수>= 구매 개수
             if (promotableQuantity >= purchaseQuantity) {
+
+                if(purchaseQuantity%promotionAcquiredQuantity == 0){
+                    promotable.decreaseQuantity(purchaseQuantity);
+                    receipt.updateReceipt(purchasedProduct, purchaseQuantity, purchaseQuantity / promotionAcquiredQuantity);
+                    continue;
+                }
+                int currentNonPromotableQuantity = purchaseQuantity%promotionAcquiredQuantity;
+
+                boolean purchaseFullPrice = getValidInput(
+                        () -> inputView.readPurchaseFullPrice(productName, currentNonPromotableQuantity),
+                        this::isValidPositive
+                );
+
+                if(!purchaseFullPrice){
+                    purchasedProduct.decreaseQuantity(currentNonPromotableQuantity);
+                    promotable.decreaseQuantity(purchaseQuantity);
+                    int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
+                    receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
+                    continue;
+                }
+
                 promotable.decreaseQuantity(purchaseQuantity);
 
                 //내가 프로모션 받은 거 개수
@@ -162,6 +183,7 @@ public class PromotionController {
             }
 
             //아래로 다 프로모션 받을 수 있는 개수< 구매 개수
+            //=========================================
 
             boolean purchaseFullPrice = getValidInput(
                     () -> inputView.readPurchaseFullPrice(productName, nonPromotableQuantity),
