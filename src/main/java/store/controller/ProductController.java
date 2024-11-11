@@ -14,7 +14,8 @@ import store.view.error.InputErrorType;
 public class ProductController {
 
     private static final Pattern BRACKET_PATTERN = Pattern.compile("\\[(.*?)]");
-    private static final Pattern PRODUCT_PATTERN = Pattern.compile("^[가-힣a-zA-Z]+-\\d+$");
+    private static final Pattern PRODUCT_NAME_PATTERN = Pattern.compile("^[가-힣a-zA-Z]+$");
+    private static final Pattern QUANTITY_PATTERN = Pattern.compile("^\\d+$");
 
     public List<String> extractValidProducts(String input) throws ErrorException {
         List<String> products = new ArrayList<>();
@@ -24,12 +25,24 @@ public class ProductController {
 
         while (matcher.find()) {
             String product = matcher.group(1);
-            if (isValidProductFormat(product)) {
-                products.add(product);
-                matchCount++;
-            } else {
+            String[] parts = product.split("-");
+            if (parts.length != 2) {
                 throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
             }
+
+            String productName = parts[0];
+            String quantity = parts[1];
+
+            if (!PRODUCT_NAME_PATTERN.matcher(productName).matches()) {
+                throw new ErrorException(InputErrorType.NEED_AVAILABLE_FORMAT);
+            }
+
+            if (!QUANTITY_PATTERN.matcher(quantity).matches()) {
+                throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
+            }
+
+            products.add(product);
+            matchCount++;
         }
 
         if (products.isEmpty()) {
@@ -58,11 +71,6 @@ public class ProductController {
         }
         return count;
     }
-
-    private boolean isValidProductFormat(String product) {
-        return PRODUCT_PATTERN.matcher(product).matches();
-    }
-
 
     public void checkProductInConvenience(PurchasedProducts purchasedProducts, ProductStock productStock) {
         List<String> productNames = purchasedProducts.getProductsNames();
