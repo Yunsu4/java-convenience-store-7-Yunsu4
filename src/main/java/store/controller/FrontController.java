@@ -90,7 +90,7 @@ public class FrontController {
     private void printTotalReceipt(Receipt receipt) {
         outputView.printReceiptStart();
         printProductDetails(receipt);
-        outputView.startPrintBonusProduct();
+        //outputView.startPrintBonusProduct();
         printBonusProductDetails(receipt);
         outputView.printDividingLine();
         receipt.printFinalReceipt();
@@ -149,6 +149,9 @@ public class FrontController {
             if ((i + 1) % groupSize != 0 && i != bonusProductDetails.size() - 1) {
                 output.append(detail).append("            ");
             }
+        }
+        if(!output.isEmpty()){
+            outputView.startPrintBonusProduct();
         }
 
         System.out.print(output);
