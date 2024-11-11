@@ -188,11 +188,29 @@ public class PromotionController {
                 }
                 int currentNonPromotableQuantity = purchaseQuantity%promotionAcquiredQuantity;
 
-                promotable.decreaseQuantity(purchaseQuantity-currentNonPromotableQuantity);
-                nonPromotable.decreaseQuantity(currentNonPromotableQuantity);
-                int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
+                // 1+1 프로모션이고, 구매 수량이 홀수인 경우
+                if (promotionMinQuantity == 1 && currentNonPromotableQuantity == 1) {
+                    boolean addItem = getValidInput(
+                            () -> inputView.readAddItem(productName, 1),
+                            this::isValidPositive
+                    );
 
-                receipt.updateReceipt(purchasedProduct, received, received/promotionAcquiredQuantity);
+                    if (addItem) {
+                        purchasedProduct.addQuantity();
+                        purchaseQuantity++;
+                        promotable.decreaseQuantity(purchaseQuantity);
+                        receipt.updateReceipt(purchasedProduct, purchaseQuantity, purchaseQuantity / 2);
+                    } else {
+                        promotable.decreaseQuantity(purchaseQuantity - 1);
+                        nonPromotable.decreaseQuantity(1);
+                        receipt.updateReceipt(purchasedProduct, purchaseQuantity - 1, (purchaseQuantity - 1) / 2);
+                    }
+                } else {
+                    promotable.decreaseQuantity(purchaseQuantity - currentNonPromotableQuantity);
+                    nonPromotable.decreaseQuantity(currentNonPromotableQuantity);
+                    int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
+                    receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
+                }
                 continue;
             }
 
