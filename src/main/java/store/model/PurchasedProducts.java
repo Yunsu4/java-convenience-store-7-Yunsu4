@@ -80,7 +80,7 @@ public class PurchasedProducts {
 
     private void validateQuantity(int quantity) throws ErrorException{
         if (quantity <= 0) {
-            throw new ErrorException(InputErrorType.NEED_PRODUCT_COUNT_WITHIN_STOCK);
+            throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
         }
     }
 
