@@ -172,6 +172,12 @@ public class PromotionController {
             purchaseQuantity = purchasedProduct.parseQuantity();
             int nonPromotableQuantity = purchaseQuantity - promotableQuantity;
 
+
+
+
+
+
+            
             // 프로모션 받을 수 있는 개수>= 구매 개수
             if (promotableQuantity >= purchaseQuantity) {
 
@@ -182,26 +188,20 @@ public class PromotionController {
                 }
                 int currentNonPromotableQuantity = purchaseQuantity%promotionAcquiredQuantity;
 
-                boolean purchaseFullPrice = getValidInput(
-                        () -> inputView.readPurchaseFullPrice(productName, currentNonPromotableQuantity),
-                        this::isValidPositive
-                );
-
-                if(!purchaseFullPrice){
-                    purchasedProduct.decreaseQuantity(currentNonPromotableQuantity);
-                    int currentPurchaseQuantity = purchasedProduct.parseQuantity();
-                    promotable.decreaseQuantity(currentPurchaseQuantity);
-                    receipt.updateReceipt(purchasedProduct, currentPurchaseQuantity, currentPurchaseQuantity / promotionAcquiredQuantity);
-                    continue;
-                }
-
-                promotable.decreaseQuantity(purchaseQuantity);
-
-                //내가 프로모션 받은 거 개수
+                promotable.decreaseQuantity(purchaseQuantity-currentNonPromotableQuantity);
+                nonPromotable.decreaseQuantity(currentNonPromotableQuantity);
                 int received = purchaseQuantity / promotionAcquiredQuantity * promotionAcquiredQuantity;
-                receipt.updateReceipt(purchasedProduct, received, received / promotionAcquiredQuantity);
+
+                receipt.updateReceipt(purchasedProduct, received, received/promotionAcquiredQuantity);
                 continue;
             }
+
+
+
+
+
+
+
 
             //아래로 다 프로모션 받을 수 있는 개수< 구매 개수
             //=========================================
