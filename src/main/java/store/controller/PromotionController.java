@@ -204,12 +204,13 @@ public class PromotionController {
 
 
     public static <T> T getValidInput(Supplier<String> inputSupplier, Function<String, T> converter) {
-        String input = inputSupplier.get();
-        try {
-            return converter.apply(input);
-        } catch (ErrorException e) {
-            System.out.println(e.getMessage());
-            return getValidInput(inputSupplier, converter);
+        while (true) {
+            String input = inputSupplier.get();
+            try {
+                return converter.apply(input);
+            } catch (ErrorException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
