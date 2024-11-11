@@ -31,21 +31,6 @@ public class PurchasedProducts {
         }
     }
 
-    /*
-    public List<Product> extractPurchasedProduct(List<String> items) throws ErrorException {
-
-        return items.stream()
-                .map(product -> product.split("-"))
-                .map(parts -> {
-                    Map<String, Object> product = new LinkedHashMap<>();
-                    product.put("name", parts[0]);
-                    product.put("quantity", parseValidQuantity(parts[1]));
-                    return new Product(product);
-                })
-                .toList();
-    }
-
-     */
 
     public List<Product> extractPurchasedProduct(List<String> items) throws ErrorException {
         Map<String, Product> productMap = new LinkedHashMap<>();
@@ -82,10 +67,6 @@ public class PurchasedProducts {
         if (quantity <= 0) {
             throw new ErrorException(InputErrorType.NEED_AVAILABLE_INPUT);
         }
-    }
-
-    public void display() {
-        purchasedProducts.forEach(Product::display);
     }
 
     public List<Product> getProducts() {
